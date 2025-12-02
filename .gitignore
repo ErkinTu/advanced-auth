@@ -1,4 +1,75 @@
+# Base
 .idea/
 .vscode/
+DS_Store/
 
+
+# SERVER
+server/vendor/
+
+server/bin/
+
+# Environment files
 server/.env
+server/.env.local
+server/.env.production
+server/.env.development
+
+# Logs
+server/logs/
+
+# Database files
+server/database/
+
+# Temporary files
+server/tmp/
+server/dump/
+
+# Backup files
+*.bak
+*.swp
+
+
+# CLIENT
+# Logs
+client/logs/
+client/*.log
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/pnpm-debug.log*
+client/lerna-debug.log*
+
+# Dependencies
+client/node_modules/
+
+# Build output
+client/dist/
+client/dist-ssr/
+client/coverage/
+
+# Local env files
+client/*.local
+
+# Editor folders/files
+client/.vscode/*
+!client/.vscode/extensions.json
+client/.idea/
+client/*.suo
+client/*.ntvs*
+client/*.njsproj
+client/*.sln
+client/*.sw?
+
+# TS build info
+client/*.tsbuildinfo
+
+# ESLint cache
+client/.eslintcache
+
+# Cypress
+client/cypress/videos/
+client/cypress/screenshots/
+
+# Vitest screenshots
+client/__screenshots__/
