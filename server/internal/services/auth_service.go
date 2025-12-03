@@ -6,6 +6,7 @@ import (
 	"AdvAuthGo/internal/repositories"
 	"AdvAuthGo/internal/utils"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,20 +27,18 @@ type AuthService interface {
 }
 
 type authService struct {
-	userRepo  repositories.UserRepository
-	tokenRepo repositories.TokenRepository
-	config    *config.Config
+	userRepo    repositories.UserRepository
+	tokenRepo   repositories.TokenRepository
+	emailSender *utils.EmailSender
+	config      *config.Config
 }
 
-func NewAuthService(
-	userRepo repositories.UserRepository,
-	tokenRepo repositories.TokenRepository,
-	cfg *config.Config,
-) AuthService {
+func NewAuthService(userRepo repositories.UserRepository, tokenRepo repositories.TokenRepository, emailSender *utils.EmailSender, cfg *config.Config) AuthService {
 	return &authService{
-		userRepo:  userRepo,
-		tokenRepo: tokenRepo,
-		config:    cfg,
+		userRepo:    userRepo,
+		tokenRepo:   tokenRepo,
+		emailSender: emailSender,
+		config:      cfg,
 	}
 }
 
@@ -63,6 +62,13 @@ func (s *authService) Register(email, password string) (*TokenPair, error) {
 
 	if err := s.userRepo.Create(user); err != nil {
 		return nil, err
+	}
+
+	activationURL := fmt.Sprintf("http://localhost:8080/api/activate/%s", user.ActivationLink)
+
+	err = s.emailSender.SendActivationEmail(email, activationURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send email: %w", err)
 	}
 
 	return s.generateAndSaveTokens(user)
