@@ -3,6 +3,7 @@ package handlers
 import (
 	"AdvAuthGo/internal/services"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +26,21 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+func setRefreshCookie(c *gin.Context, refreshToken string) {
+	expire := 30 * 24 * time.Hour
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		Domain:   "localhost",
+		Expires:  time.Now().Add(expire),
+		MaxAge:   int(expire.Seconds()),
+		Secure:   false, // true in prod when using HTTPS
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -38,9 +54,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	setRefreshCookie(c, tokens.RefreshToken)
+
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "User registered. Please activate your account.",
-		"tokens":  tokens,
+		"message":      "User registered. Please activate your account.",
+		"access_token": tokens.AccessToken,
 	})
 }
 
@@ -57,9 +75,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	setRefreshCookie(c, tokens.RefreshToken)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
-		"tokens":  tokens,
+		"message":      "Login successful",
+		"access_token": tokens.AccessToken,
 	})
 }
 
@@ -75,17 +95,36 @@ func (h *AuthHandler) Activate(c *gin.Context) {
 }
 
 func (h *AuthHandler) Refresh(c *gin.Context) {
-	token := c.Param("token")
+	//token := c.Param("token")
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil || refreshToken == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token missing"})
+		return
+	}
 
-	tokens, err := h.service.Refresh(token)
+	tokens, err := h.service.Refresh(refreshToken)
 	if err != nil {
+		// delete cookie on invalid refresh
+		http.SetCookie(c.Writer, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    "",
+			Path:     "/",
+			Domain:   "localhost",
+			Expires:  time.Unix(0, 0),
+			MaxAge:   -1,
+			Secure:   false,
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+		})
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
+	setRefreshCookie(c, tokens.RefreshToken)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Tokens refreshed",
-		"tokens":  tokens,
+		"message":      "Tokens refreshed",
+		"access_token": tokens.AccessToken,
 	})
 }
 

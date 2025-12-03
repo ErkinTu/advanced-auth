@@ -6,6 +6,7 @@ import (
 	"AdvAuthGo/internal/handlers"
 	"AdvAuthGo/internal/repositories"
 	"AdvAuthGo/internal/services"
+	"AdvAuthGo/internal/utils"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -14,13 +15,14 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	db := database.Connect(cfg)
+	emailSender := utils.NewEmailSender(cfg)
 
 	database.Migrate(db)
 
 	userRepo := repositories.NewUserRepository(db)
 	tokenRepo := repositories.NewTokenRepository(db)
 
-	authService := services.NewAuthService(userRepo, tokenRepo, cfg)
+	authService := services.NewAuthService(userRepo, tokenRepo, emailSender, cfg)
 	authHandler := handlers.NewAuthHandler(authService)
 
 	router := gin.Default()
@@ -29,8 +31,8 @@ func main() {
 	{
 		api.POST("/register", authHandler.Register)
 		api.POST("/login", authHandler.Login)
-		api.POST("/activate/:token", authHandler.Activate)
-		api.POST("/refresh/:token", authHandler.Refresh)
+		api.GET("/activate/:token", authHandler.Activate)
+		api.POST("/refresh", authHandler.Refresh)
 		api.GET("/users", authHandler.GetUsers)
 	}
 
