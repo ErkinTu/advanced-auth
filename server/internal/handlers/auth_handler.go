@@ -31,13 +31,13 @@ func setRefreshCookie(c *gin.Context, refreshToken string) {
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    refreshToken,
-		Path:     "/",
-		Domain:   "localhost",
+		Path:     "/api",
+		Domain:   "",
 		Expires:  time.Now().Add(expire),
 		MaxAge:   int(expire.Seconds()),
 		Secure:   false, // true in prod when using HTTPS
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
 	})
 }
 
@@ -98,7 +98,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 	//token := c.Param("token")
 	refreshToken, err := c.Cookie("refresh_token")
 	if err != nil || refreshToken == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token missing"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
@@ -108,13 +108,13 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 		http.SetCookie(c.Writer, &http.Cookie{
 			Name:     "refresh_token",
 			Value:    "",
-			Path:     "/",
-			Domain:   "localhost",
+			Path:     "/api",
+			Domain:   "",
 			Expires:  time.Unix(0, 0),
 			MaxAge:   -1,
 			Secure:   false,
 			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
+			SameSite: http.SameSiteStrictMode,
 		})
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
