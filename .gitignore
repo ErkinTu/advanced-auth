@@ -50,6 +50,7 @@ client/coverage/
 
 # Local env files
 client/*.local
+client/.env
 
 # Editor folders/files
 client/.vscode/*
