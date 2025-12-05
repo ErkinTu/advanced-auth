@@ -21,11 +21,22 @@ export const useAuthStore = defineStore('auth', () => {
 
 export const useUserStore = defineStore('users', () => {
   const users = ref<User[]>([])
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
 
   async function loadUsers() {
-    const res = await getUsersRequest()
-    users.value = res.data.users
+    isLoading.value = true
+    error.value = null
+    try {
+      const res = await getUsersRequest()
+      users.value = res.data.users
+    } catch (e: any) {
+      console.error("Failed to load users", e)
+      error.value = "Failed to load users"
+    } finally {
+      isLoading.value = false
+    }
   }
 
-  return {users, loadUsers}
+  return {users, loadUsers, isLoading, error}
 })

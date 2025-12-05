@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center text-center p-6">
+  <div class="flex flex-col items-center justify-center text-center p-6">
     <h1 class="text-3xl font-bold mb-4">Welcome</h1>
 
     <p class="text-gray-600 max-w-md">
