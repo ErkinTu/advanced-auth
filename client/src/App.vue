@@ -1,19 +1,9 @@
-<script setup>
+<script setup lang="ts">
 
 </script>
 
 <template>
-  <header>
-    Header
-  </header>
-
-  <main>
-    <div class="text-2xl">Main</div>
-  </main>
-
-  <footer>
-    Footer
-  </footer>
+  <router-view />
 </template>
 
 <style scoped>
