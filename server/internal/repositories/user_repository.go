@@ -50,7 +50,7 @@ func (r *userRepository) Update(user *models.User) error {
 }
 
 func (r *userRepository) GetAll() ([]models.User, error) {
-	var users []models.User
+	users := []models.User{}
 	err := r.db.Find(&users).Error
 	return users, err
 }

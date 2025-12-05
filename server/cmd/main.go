@@ -46,6 +46,6 @@ func main() {
 		api.GET("/users", authHandler.GetUsers)
 	}
 
-	log.Println("Server started on port %s", cfg.ServerPort)
+	log.Printf("Server started on port %s", cfg.ServerPort)
 	router.Run(":8080")
 }
