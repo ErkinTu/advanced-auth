@@ -1,5 +1,6 @@
 import type {AuthCredentials} from "@/types/auth.ts";
 import {useAuthStore, useUserStore} from "@/store/auth.ts";
+import {storeToRefs} from "pinia";
 
 export function useAuth() {
   const auth = useAuthStore()
@@ -12,5 +13,7 @@ export function useAuth() {
 
 export function useUsers() {
   const store = useUserStore()
-  return {users: store.users, loadUsers: store.loadUsers}
+  const { users, isLoading, error } = storeToRefs(store)
+
+  return {users: store.users, loadUsers: store.loadUsers, isLoading: store.isLoading, error: store.error}
 }
