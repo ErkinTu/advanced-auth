@@ -1,1 +1,37 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+
+@theme {
+    @keyframes bounce-in-up {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        60% {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fade-out {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+}
+
+.animate-bounce-in-up {
+    animation: bounce-in-up 0.25s ease-out forwards;
+}
+
+.animate-fade-out {
+    animation: fade-out 0.1s ease-in forwards;
+}
