@@ -10,20 +10,18 @@ onMounted(loadUsers)
 
 <template>
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-black">System Users</h2>
+    <h2 class="page-title">System Users</h2>
     <p class="mb-5">Manage user access and activation status</p>
 
-    <div class="border border-gray-200 rounded-xl shadow p-6 bg-gray-100/50">
-      <h3 class="font-semibold text-lg text-black">User Directory</h3>
-      <p class="text-gray-600 mb-6">A list of all registered users in the system.</p>
+    <div class="table-container">
+      <h3 class="section-subtitle">User Directory</h3>
+      <p class="text-secondary mb-6">A list of all registered users in the system.</p>
 
-      <div v-if="isLoading" class="text-gray-500">Loading...</div>
-      <div v-else-if="error" class="text-red-500">{{ error }}</div>
-      <div v-else-if="users.length === 0" class="text-gray-500">No users found</div>
+      <div v-if="isLoading" class="text-muted">Loading...</div>
+      <div v-else-if="error" class="text-error">{{ error }}</div>
+      <div v-else-if="users.length === 0" class="text-muted">No users found</div>
 
-      <div
-        class="grid grid-cols-[3fr_1fr_1.5fr_auto] px-4 py-2 text-sm font-semibold text-gray-600 border-b border-gray-200"
-      >
+      <div class="table-header">
         <span>User Email</span>
         <span>Role</span>
         <span>Joined Date</span>
@@ -33,27 +31,27 @@ onMounted(loadUsers)
       <div
         v-for="u in users"
         :key="u.id"
-        class="grid grid-cols-[3fr_1fr_1.5fr_auto] px-4 py-3 items-center border-b border-gray-100 hover:bg-gray-50 transition"
+        class="table-row"
       >
-        <span class="font-medium text-black">
+        <span class="font-medium text-[var(--color-text-primary)]">
         {{ u.email }}
       </span>
 
-        <span class="text-gray-700">
+        <span class="text-secondary">
         Admin
       </span>
 
-        <span class="text-gray-700">
+        <span class="text-secondary">
         {{ u.created_at }}
       </span>
 
         <span class="flex justify-end">
         <span
           :class="[
-            'px-3 py-1 text-xs rounded-full font-medium inline-flex items-center gap-2',
+            'badge-status',
             u.is_activated
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-gray-200 text-gray-700'
+              ? 'badge-status-active'
+              : 'badge-status-pending'
           ]"
         >
           <svg
