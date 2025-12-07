@@ -6,10 +6,10 @@
   <div class="min-h-screen flex flex-col text-gray-600">
 
     <!-- Header -->
-    <header class="flex items-center justify-between px-10 py-4 bg-gray-100/98 fixed w-full top-0 z-10">
+    <header class="flex items-center justify-between px-10 py-4 bg-gray-100/98 fixed w-full top-0 z-10 border-b border-gray-200">
       <div class="flex items-center">
         <router-link to="/" class="text-xl text-cyan-900 font-bold pr-10">Auth <span class="text-black">UI</span></router-link>
-        <div class="flex gap-2 text-sm=">
+        <div class="flex gap-2 text-sm">
           <router-link to="/">Home</router-link>
           <router-link to="/users">Users</router-link>
         </div>
@@ -22,9 +22,16 @@
       </div>
     </header>
 
-    <!-- Main -->
     <main class="flex-1 p-4 mt-15">
-      <router-view/>
+      <RouterView v-slot="{ Component }">
+        <transition
+          mode="out-in"
+          enter-active-class="animate-bounce-in-up"
+          leave-active-class="animate-fade-out"
+        >
+          <component :is="Component" />
+        </transition>
+      </RouterView>
     </main>
 
     <!-- Footer -->
