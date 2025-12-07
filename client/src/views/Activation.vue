@@ -16,5 +16,5 @@ onMounted(async () => {
 
 
 <template>
-  <div class="p-6 text-center text-xl">{{ message }}</div>
+  <div class="page-title p-6 text-center">{{ message }}</div>
 </template>
