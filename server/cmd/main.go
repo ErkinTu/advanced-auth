@@ -23,8 +23,9 @@ func main() {
 
 	userRepo := repositories.NewUserRepository(db)
 	tokenRepo := repositories.NewTokenRepository(db)
+	roleRepo := repositories.NewRoleRepository(db)
 
-	authService := services.NewAuthService(userRepo, tokenRepo, emailSender, cfg)
+	authService := services.NewAuthService(userRepo, tokenRepo, emailSender, cfg, roleRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 
 	router := gin.Default()
@@ -44,6 +45,8 @@ func main() {
 		api.GET("/activate/:token", authHandler.Activate)
 		api.POST("/refresh", authHandler.Refresh)
 		api.GET("/users", authHandler.GetUsers)
+		api.POST("/role/create", authHandler.CreateRole)
+		api.POST("/role/assign", authHandler.AssignRoleToUser)
 	}
 
 	log.Printf("Server started on port %s", cfg.ServerPort)

@@ -26,6 +26,11 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type AssignRoleRequest struct {
+	UserID   string `json:"user_id" binding:"required"`
+	RoleName string `json:"role_name" binding:"required"`
+}
+
 func setRefreshCookie(c *gin.Context, refreshToken string) {
 	expire := 30 * 24 * time.Hour
 	http.SetCookie(c.Writer, &http.Cookie{
@@ -84,6 +89,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Activate(c *gin.Context) {
+	// parse token from URL param
 	token := c.Param("token")
 
 	if err := h.service.Activate(token); err != nil {
@@ -136,4 +142,42 @@ func (h *AuthHandler) GetUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+
+func (h *AuthHandler) CreateRole(c *gin.Context) {
+	var body struct {
+		Name string `json:"role_name" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if body.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "role name is required"})
+		return
+	}
+
+	if err := h.service.CreateRole(body.Name); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Role created successfully"})
+}
+
+func (h *AuthHandler) AssignRoleToUser(c *gin.Context) {
+	var req AssignRoleRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.AssignRoleToUser(req.UserID, req.RoleName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Role assigned successfully"})
 }
