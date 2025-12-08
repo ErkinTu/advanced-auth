@@ -10,6 +10,8 @@ type User struct {
 	ActivationLink string    `gorm:"column:activation_link" json:"-"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
+
+	Roles []Role `gorm:"many2many:user_roles;"`
 }
 
 func (User) TableName() string {
