@@ -26,6 +26,7 @@ type AuthService interface {
 	Activate(token string) error
 	Refresh(refreshToken string) (*TokenPair, error)
 	GetAllUsers() ([]models.User, error)
+	GetUserByToken(token string) (*models.User, error)
 	AssignRoleToUser(userID, roleName string) error
 	CreateRole(name string) error
 }
@@ -158,6 +159,15 @@ func (s *authService) generateAndSaveTokens(user *models.User) (*TokenPair, erro
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (s *authService) GetUserByToken(token string) (*models.User, error) {
+	claims, err := utils.ValidateToken(token, s.config.JWTSecret)
+	if err != nil {
+		return nil, errors.New("invalid or expired token")
+	}
+
+	return s.userRepo.GetByID(int(claims.UserId))
 }
 
 func (s *authService) AssignRoleToUser(userID, roleName string) error {
