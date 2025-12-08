@@ -12,3 +12,5 @@ export const activateRequest = (token: string) =>
   http.get(`/activate/${token}`)
 
 export const getUsersRequest = () => http.get<{users: User[]}>('/users')
+
+export const getCurrentUserRequest = () => http.get<User>('/user')
