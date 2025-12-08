@@ -47,6 +47,7 @@ func main() {
 		api.GET("/users", authHandler.GetUsers)
 		api.POST("/role/create", authHandler.CreateRole)
 		api.POST("/role/assign", authHandler.AssignRoleToUser)
+		api.GET("/me", authHandler.GetUser)
 	}
 
 	log.Printf("Server started on port %s", cfg.ServerPort)
