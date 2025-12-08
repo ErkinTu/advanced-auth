@@ -33,6 +33,16 @@ const routes = [
         component: () => import('../views/Users.vue'),
         meta: { public: true }
       },
+      {
+        path: 'activation/:token',
+        name: 'Activation',
+        component: () => import('../views/Activation.vue'),
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../views/Profile.vue')
+      }
     ]
   },
 
