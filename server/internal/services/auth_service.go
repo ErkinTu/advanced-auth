@@ -7,10 +7,12 @@ import (
 	"AdvAuthGo/internal/utils"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type TokenPair struct {
@@ -24,6 +26,8 @@ type AuthService interface {
 	Activate(token string) error
 	Refresh(refreshToken string) (*TokenPair, error)
 	GetAllUsers() ([]models.User, error)
+	AssignRoleToUser(userID, roleName string) error
+	CreateRole(name string) error
 }
 
 type authService struct {
@@ -31,14 +35,16 @@ type authService struct {
 	tokenRepo   repositories.TokenRepository
 	emailSender *utils.EmailSender
 	config      *config.Config
+	roleRepo    repositories.RoleRepository
 }
 
-func NewAuthService(userRepo repositories.UserRepository, tokenRepo repositories.TokenRepository, emailSender *utils.EmailSender, cfg *config.Config) AuthService {
+func NewAuthService(userRepo repositories.UserRepository, tokenRepo repositories.TokenRepository, emailSender *utils.EmailSender, cfg *config.Config, roleRepo repositories.RoleRepository) AuthService {
 	return &authService{
 		userRepo:    userRepo,
 		tokenRepo:   tokenRepo,
 		emailSender: emailSender,
 		config:      cfg,
+		roleRepo:    roleRepo,
 	}
 }
 
@@ -152,4 +158,49 @@ func (s *authService) generateAndSaveTokens(user *models.User) (*TokenPair, erro
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (s *authService) AssignRoleToUser(userID, roleName string) error {
+	role, err := s.roleRepo.GetByName(roleName)
+	if err != nil {
+		return err
+	}
+
+	userIDInt, err := strconv.Atoi(userID)
+	if err != nil {
+		return err
+	}
+
+	user, err := s.userRepo.GetByID(userIDInt)
+	if err != nil {
+		return err
+	}
+
+	for _, r := range user.Roles {
+		if r.ID == role.ID {
+			return errors.New("role already assigned")
+		}
+	}
+
+	user.Roles = append(user.Roles, *role)
+	return s.userRepo.Update(user)
+}
+
+func (s *authService) CreateRole(roleName string) error {
+	existingRole, err := s.roleRepo.GetByName(roleName)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			existingRole = nil
+		} else {
+			return err
+		}
+	}
+
+	if existingRole != nil {
+		return errors.New("role already exists")
+	}
+
+	role := &models.Role{Name: roleName}
+	return s.roleRepo.Create(role)
 }
