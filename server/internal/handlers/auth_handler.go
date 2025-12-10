@@ -31,11 +31,10 @@ type AssignRoleRequest struct {
 	RoleName string `json:"role_name" binding:"required"`
 }
 
-func setRefreshCookie(c *gin.Context, refreshToken string) {
-	expire := 30 * 24 * time.Hour
+func setCookie(c *gin.Context, name, token string, expire time.Duration) {
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "refresh_token",
-		Value:    refreshToken,
+		Name:     name,
+		Value:    token,
 		Path:     "/api",
 		Domain:   "",
 		Expires:  time.Now().Add(expire),
@@ -59,11 +58,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	setRefreshCookie(c, tokens.RefreshToken)
+	setCookie(c, "access_token", tokens.AccessToken, 15*time.Minute)
+	setCookie(c, "refresh_token", tokens.RefreshToken, 30*24*time.Hour)
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message":      "User registered. Please activate your account.",
-		"access_token": tokens.AccessToken,
+		"message": "User registered. Please activate your account.",
 	})
 }
 
@@ -80,11 +79,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	setRefreshCookie(c, tokens.RefreshToken)
+	setCookie(c, "access_token", tokens.AccessToken, 15*time.Minute)
+	setCookie(c, "refresh_token", tokens.RefreshToken, 30*24*time.Hour)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":      "Login successful",
-		"access_token": tokens.AccessToken,
+		"message": "Login successful",
 	})
 }
 
@@ -101,7 +100,6 @@ func (h *AuthHandler) Activate(c *gin.Context) {
 }
 
 func (h *AuthHandler) Refresh(c *gin.Context) {
-	//token := c.Param("token")
 	refreshToken, err := c.Cookie("refresh_token")
 	if err != nil || refreshToken == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -126,7 +124,8 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 		return
 	}
 
-	setRefreshCookie(c, tokens.RefreshToken)
+	setCookie(c, "access_token", tokens.AccessToken, 15*time.Minute)
+	setCookie(c, "refresh_token", tokens.RefreshToken, 30*24*time.Hour)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "Tokens refreshed",

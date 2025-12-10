@@ -135,12 +135,12 @@ func (s *authService) GetAllUsers() ([]models.User, error) {
 }
 
 func (s *authService) generateAndSaveTokens(user *models.User) (*TokenPair, error) {
-	accessToken, err := utils.GenerateToken(uint(user.ID), user.Email, s.config.JWTSecret, 15*time.Minute)
+	accessToken, err := utils.GenerateToken(uint(user.ID), user.Email, utils.ExtractRoleNames(user.Roles), s.config.JWTSecret, 15*time.Minute)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := utils.GenerateToken(uint(user.ID), user.Email, s.config.JWTSecret, 30*24*time.Hour)
+	refreshToken, err := utils.GenerateToken(uint(user.ID), user.Email, utils.ExtractRoleNames(user.Roles), s.config.JWTSecret, 30*24*time.Hour)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (s *authService) GetUserByToken(token string) (*models.User, error) {
 		return nil, errors.New("invalid or expired token")
 	}
 
-	return s.userRepo.GetByID(int(claims.UserId))
+	return s.userRepo.GetByIDWithRoles(int(claims.UserId))
 }
 
 func (s *authService) AssignRoleToUser(userID, roleName string) error {
@@ -181,7 +181,7 @@ func (s *authService) AssignRoleToUser(userID, roleName string) error {
 		return err
 	}
 
-	user, err := s.userRepo.GetByID(userIDInt)
+	user, err := s.userRepo.GetByIDWithRoles(userIDInt)
 	if err != nil {
 		return err
 	}

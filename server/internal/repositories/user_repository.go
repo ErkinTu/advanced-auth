@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	Create(user *models.User) error
 	GetByID(id int) (*models.User, error)
+	GetByIDWithRoles(id int) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 	GetByActivationLink(link string) (*models.User, error)
 	Update(user *models.User) error
@@ -36,6 +37,12 @@ func (r *userRepository) GetByEmail(email string) (*models.User, error) {
 func (r *userRepository) GetByID(id int) (*models.User, error) {
 	var user models.User
 	err := r.db.First(&user, id).Error
+	return &user, err
+}
+
+func (r *userRepository) GetByIDWithRoles(id int) (*models.User, error) {
+	var user models.User
+	err := r.db.Preload("Roles").First(&user, id).Error
 	return &user, err
 }
 
