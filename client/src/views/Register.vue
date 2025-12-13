@@ -1,52 +1,77 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {useAuth} from '@/composables/useAuth'
+import {useRouter} from 'vue-router'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
-
-const {register} = useAuth()
+const router = useRouter()
+const {register, isLoading} = useAuth()
 
 const email = ref('')
 const password = ref('')
+const error = ref<string | null>(null)
+const successMessage = ref<string | null>(null)
 
 async function submit() {
-  await register({email: email.value, password: password.value})
+  error.value = null
+  successMessage.value = null
+
+  try {
+    await register({email: email.value, password: password.value})
+    successMessage.value = 'Registration successful! Please check your email to activate your account.'
+
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
+  } catch (e: any) {
+    error.value = e.response?.data?.message || 'Registration failed. Please try again.'
+  }
 }
 </script>
-
 
 <template>
   <div>
     <div class="form-container">
       <h2 class="section-title">Create an account</h2>
       <p class="form-description">Enter your email below to create your account</p>
-      
+
+      <div v-if="successMessage" class="mb-4 p-3 bg-green-100 text-green-800 rounded-md text-sm">
+        {{ successMessage }}
+      </div>
+
+      <div v-if="error" class="mb-4 p-3 bg-red-100 text-red-800 rounded-md text-sm">
+        {{ error }}
+      </div>
+
       <BaseInput
         v-model="email"
         id="email"
         label="Email"
         type="email"
         placeholder="Enter your email"
+        :disabled="isLoading"
       />
-      
+
       <BaseInput
         v-model="password"
         id="password"
         label="Password"
         type="password"
         placeholder="Enter your password"
+        :disabled="isLoading"
       />
-      
+
       <BaseButton
         @click="submit"
         variant="primary"
         type="submit"
         class="mt-4 w-full"
+        :disabled="isLoading"
       >
-        Create account
+        {{ isLoading ? 'Creating account...' : 'Create account' }}
       </BaseButton>
-      
+
       <p class="mt-2 text-sm">Already have an account? <router-link to="/login" class="link-primary">Sign in</router-link></p>
     </div>
   </div>
