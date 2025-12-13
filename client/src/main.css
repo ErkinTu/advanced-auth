@@ -199,7 +199,7 @@
         @apply text-[var(--color-text-secondary)] border-b border-[var(--color-border-primary)];
     }
     
-    .table-row {
+    .my-table-row {
         @apply grid grid-cols-[3fr_1fr_1.5fr_auto] px-4 py-3 items-center;
         @apply border-b border-[var(--color-border-secondary)];
         @apply hover:bg-gray-50 transition-[var(--transition-default)];
