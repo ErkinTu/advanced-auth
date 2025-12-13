@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import {useUserStore} from "@/store/auth.ts";
+import {useAuthStore, useUserStore} from "@/store/auth.ts";
 
 
 import Layout from '@/layouts/Layout.vue'
@@ -33,10 +33,21 @@ const routes = [
         component: () => import('../views/Users.vue'),
         meta: { public: true }
       },
+      {
+        path: 'activation/:token',
+        name: 'Activation',
+        component: () => import('../views/Activation.vue'),
+        meta: { public: true }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../views/Profile.vue'),
+        meta: { public: true }
+      }
     ]
   },
 
-  // 404 fallback
   {
     path: '/:pathMatch(.*)*',
     redirect: '/'
@@ -49,12 +60,30 @@ export const router = createRouter({
   routes,
 });
 
+let isSessionInitialized = false
+
 router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
+  if (!isSessionInitialized) {
+    isSessionInitialized = true
+    await authStore.loadCurrentUser()
+  }
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    return next({ name: 'Login', query: { redirect: to.fullPath } })
+  }
+
+  if (authStore.isAuthenticated && (to.name === 'Login' || to.name === 'Register')) {
+    return next({ name: 'Profile' })
+  }
+
   if (to.name === 'Users') {
-    const store = useUserStore()
-    if (store.users.length === 0) {
-      await store.loadUsers()
+    const userStore = useUserStore()
+    if (userStore.users.length === 0) {
+      await userStore.loadUsers()
     }
   }
+
   next()
 })

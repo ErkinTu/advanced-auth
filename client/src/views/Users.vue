@@ -4,54 +4,68 @@ import {onMounted} from 'vue'
 import TableContainer from '@/components/ui/TableContainer.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 
-
 const {users, loadUsers, isLoading, error} = useUsers()
 
 onMounted(loadUsers)
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
 </script>
 
 <template>
   <div class="p-6">
     <h2 class="page-title">System Users</h2>
-    <p class="mb-5">Manage user access and activation status</p>
+    <p class="mb-5 text-secondary">Manage user access and activation status</p>
 
-    <TableContainer 
+    <TableContainer
       title="User Directory"
       description="A list of all registered users in the system."
     >
-      <div v-if="isLoading" class="text-muted">Loading...</div>
-      <div v-else-if="error" class="text-error">{{ error }}</div>
-      <div v-else-if="users.length === 0" class="text-muted">No users found</div>
-
-      <div class="table-header">
-        <span>User Email</span>
-        <span>Role</span>
-        <span>Joined Date</span>
-        <span class="text-right">Status</span>
+      <div v-if="isLoading" class="text-muted">Loading users...</div>
+      <div v-else-if="error" class="p-3 bg-red-100 text-red-800 rounded-md text-sm">
+        {{ error }}
+      </div>
+      <div v-else-if="users.length === 0" class="text-muted">
+        No users found
       </div>
 
-      <div
-        v-for="u in users"
-        :key="u.id"
-        class="table-row"
-      >
-        <span class="font-medium text-[var(--color-text-primary)]">
-        {{ u.email }}
-      </span>
+      <template v-else>
+        <!-- HEADER -->
+        <div class="table-header">
+          <span>User Email</span>
+          <span>ID</span>
+          <span>Joined Date</span>
+          <span class="text-right">Status</span>
+        </div>
 
-        <span class="text-secondary">
-        Admin
-      </span>
+        <!-- ROWS -->
+        <div
+          v-for="u in users"
+          :key="u.id"
+          class="my-table-row"
+        >
+          <span class="font-medium text-[var(--color-text-primary)]">
+            {{ u.email }}
+          </span>
 
-        <span class="text-secondary">
-        {{ u.created_at }}
-      </span>
+          <span class="text-secondary">
+            #{{ u.id }}
+          </span>
 
-        <span class="flex justify-end">
-        <StatusBadge :active="u.is_activated" />
-      </span>
-      </div>
+          <span class="text-secondary">
+            {{ formatDate(u.created_at) }}
+          </span>
+
+          <div class="flex justify-end">
+            <StatusBadge :active="u.is_activated" />
+          </div>
+        </div>
+      </template>
     </TableContainer>
   </div>
-
 </template>
