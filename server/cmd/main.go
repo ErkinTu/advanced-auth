@@ -4,6 +4,7 @@ import (
 	"AdvAuthGo/config"
 	"AdvAuthGo/internal/database"
 	"AdvAuthGo/internal/handlers"
+	"AdvAuthGo/internal/middleware"
 	"AdvAuthGo/internal/repositories"
 	"AdvAuthGo/internal/services"
 	"AdvAuthGo/internal/utils"
@@ -45,8 +46,11 @@ func main() {
 		api.GET("/activate/:token", authHandler.Activate)
 		api.POST("/refresh", authHandler.Refresh)
 		api.GET("/users", authHandler.GetUsers)
-		api.POST("/role/create", authHandler.CreateRole)
-		api.POST("/role/assign", authHandler.AssignRoleToUser)
+
+		api.POST("/role/create", middleware.RequireRoles(authService, "ADMIN"), authHandler.CreateRole)
+		api.POST("/role/delete", middleware.RequireRoles(authService, "ADMIN"), authHandler.DeleteRole)
+		api.POST("/role/assign", middleware.RequireRoles(authService, "ADMIN"), authHandler.AssignRoleToUser)
+
 		api.GET("/me", authHandler.GetUser)
 	}
 
