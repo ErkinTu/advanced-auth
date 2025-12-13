@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import {useAuth} from '@/composables/useAuth'
 import AppNav from './AppNav.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+
+const {currentUser, isAuthenticated, logout} = useAuth()
+
+const handleLogout = async () => {
+  await logout()
+}
 </script>
 
 <template>
@@ -11,11 +18,21 @@ import BaseButton from '@/components/ui/BaseButton.vue'
       </router-link>
       <AppNav />
     </div>
+
     <div class="flex gap-5 font-bold text-sm items-center">
-      <router-link to="/login">Login</router-link>
-      <BaseButton variant="primary" to="/register">
-        Register
-      </BaseButton>
+      <template v-if="isAuthenticated && currentUser">
+        <span class="text-gray-700 font-normal">{{ currentUser.email }}</span>
+        <BaseButton variant="secondary" @click="handleLogout">
+          Logout
+        </BaseButton>
+      </template>
+
+      <template v-else>
+        <router-link to="/login">Login</router-link>
+        <BaseButton variant="primary" to="/register">
+          Register
+        </BaseButton>
+      </template>
     </div>
   </header>
 </template>
