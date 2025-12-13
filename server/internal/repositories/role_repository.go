@@ -8,6 +8,7 @@ import (
 
 type RoleRepository interface {
 	Create(role *models.Role) error
+	Delete(role *models.Role) error
 	GetByID(id int) (*models.Role, error)
 	GetByName(name string) (*models.Role, error)
 	GetAll() ([]models.Role, error)
@@ -39,4 +40,8 @@ func (r roleRepository) GetAll() ([]models.Role, error) {
 	roles := []models.Role{}
 	err := r.db.Find(&roles).Error
 	return roles, err
+}
+
+func (r roleRepository) Delete(role *models.Role) error {
+	return r.db.Delete(&role).Error
 }

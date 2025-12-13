@@ -29,6 +29,7 @@ type AuthService interface {
 	GetUserByToken(token string) (*models.User, error)
 	AssignRoleToUser(userID, roleName string) error
 	CreateRole(name string) error
+	DeleteRole(name string) error
 }
 
 type authService struct {
@@ -213,4 +214,14 @@ func (s *authService) CreateRole(roleName string) error {
 
 	role := &models.Role{Name: roleName}
 	return s.roleRepo.Create(role)
+}
+
+func (s *authService) DeleteRole(roleName string) error {
+	existingRole, err := s.roleRepo.GetByName(roleName)
+
+	if err != nil {
+		return err
+	}
+
+	return s.roleRepo.Delete(existingRole)
 }
