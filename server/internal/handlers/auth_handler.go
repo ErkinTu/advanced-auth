@@ -182,6 +182,24 @@ func (h *AuthHandler) CreateRole(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Role created successfully"})
 }
 
+func (h *AuthHandler) DeleteRole(c *gin.Context) {
+	var body struct {
+		Name string `json:"role_name" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.DeleteRole(body.Name); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Role deleted successfully"})
+}
+
 func (h *AuthHandler) AssignRoleToUser(c *gin.Context) {
 	var req AssignRoleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
