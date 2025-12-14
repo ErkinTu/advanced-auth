@@ -214,3 +214,13 @@ func (h *AuthHandler) AssignRoleToUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Role assigned successfully"})
 }
+
+func (h *AuthHandler) GetRoles(c *gin.Context) {
+	roles, err := h.service.GetAllRoles()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"roles": roles})
+}

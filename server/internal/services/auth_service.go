@@ -30,6 +30,7 @@ type AuthService interface {
 	AssignRoleToUser(userID, roleName string) error
 	CreateRole(name string) error
 	DeleteRole(name string) error
+	GetAllRoles() ([]models.Role, error)
 }
 
 type authService struct {
@@ -224,4 +225,8 @@ func (s *authService) DeleteRole(roleName string) error {
 	}
 
 	return s.roleRepo.Delete(existingRole)
+}
+
+func (s *authService) GetAllRoles() ([]models.Role, error) {
+	return s.roleRepo.GetAll()
 }
