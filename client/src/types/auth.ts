@@ -21,3 +21,8 @@ export interface AuthResponse {
   message: string
   user?: User
 }
+
+export interface AssignRolePayload {
+  user_id: number
+  role_name: string
+}
