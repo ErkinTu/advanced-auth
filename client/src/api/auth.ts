@@ -1,5 +1,5 @@
 import http from './http';
-import type {AuthCredentials, AuthResponse, User} from '../types/auth';
+import type {AuthCredentials, AuthResponse, User, Role} from '../types/auth';
 
 export const registerRequest = (data: AuthCredentials) =>
   http.post<AuthResponse>('/register', data)
@@ -18,3 +18,9 @@ export const getUsersRequest = () =>
 
 export const getCurrentUserRequest = () =>
   http.get<{user: User}>('/me')
+
+export const getRolesRequest = () =>
+  http.get<{roles: Role[]}>('/roles')
+
+export const assignRoleRequest = (data: { user_id: number; role_name: string }) =>
+  http.post('/role/assign', data)
