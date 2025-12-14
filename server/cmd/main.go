@@ -46,6 +46,7 @@ func main() {
 		api.GET("/activate/:token", authHandler.Activate)
 		api.POST("/refresh", authHandler.Refresh)
 		api.GET("/users", authHandler.GetUsers)
+		api.GET("/roles", authHandler.GetRoles)
 
 		api.POST("/role/create", middleware.RequireRoles(authService, "ADMIN"), authHandler.CreateRole)
 		api.POST("/role/delete", middleware.RequireRoles(authService, "ADMIN"), authHandler.DeleteRole)
