@@ -23,6 +23,6 @@ export interface AuthResponse {
 }
 
 export interface AssignRolePayload {
-  user_id: number
+  user_id: string
   role_name: string
 }

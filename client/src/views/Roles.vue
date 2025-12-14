@@ -9,7 +9,7 @@ const {users, loadUsers, isLoading, error} = useUsers()
 const {roles, loadRoles, assignRole} = useRoles()
 
 const assignRolePayload = ref<AssignRolePayload>({
-  user_id: 0,
+  user_id: '',
   role_name: '',
 })
 
@@ -47,11 +47,11 @@ onMounted(() => {
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               :disabled="isLoading"
             >
-              <option :value="null">Choose a user...</option>
+              <option :value="'0'">Choose a user...</option>
               <option
                 v-for="user in users"
                 :key="user.id"
-                :value="user.id"
+                :value="String(user.id)"
               >
                 {{ user.email }}
               </option>
