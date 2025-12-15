@@ -21,7 +21,7 @@ type TokenPair struct {
 }
 
 type AuthService interface {
-	Register(email, password string) (*TokenPair, error)
+	Register(email, password, passwordConfirm string) (*TokenPair, error)
 	Login(email, password string) (*TokenPair, error)
 	Activate(token string) error
 	Refresh(refreshToken string) (*TokenPair, error)
@@ -51,10 +51,14 @@ func NewAuthService(userRepo repositories.UserRepository, tokenRepo repositories
 	}
 }
 
-func (s *authService) Register(email, password string) (*TokenPair, error) {
+func (s *authService) Register(email, password, passwordConfirm string) (*TokenPair, error) {
 	existing, _ := s.userRepo.GetByEmail(email)
 	if existing != nil && existing.ID != 0 {
 		return nil, errors.New("user already exists")
+	}
+
+	if password != passwordConfirm {
+		return nil, errors.New("passwords don't match")
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

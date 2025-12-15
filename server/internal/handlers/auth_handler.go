@@ -17,8 +17,9 @@ func NewAuthHandler(service services.AuthService) *AuthHandler {
 }
 
 type RegisterRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Email           string `json:"email" binding:"required,email"`
+	Password        string `json:"password" binding:"required,min=6"`
+	PasswordConfirm string `json:"password_confirm" binding:"required,eqfield=Password"`
 }
 
 type LoginRequest struct {
@@ -52,7 +53,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.service.Register(req.Email, req.Password)
+	tokens, err := h.service.Register(req.Email, req.Password, req.PasswordConfirm)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
