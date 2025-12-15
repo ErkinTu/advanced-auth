@@ -10,6 +10,7 @@ const {register, isLoading} = useAuth()
 
 const email = ref('')
 const password = ref('')
+const passwordConfirm = ref('')
 const error = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
 
@@ -17,13 +18,28 @@ async function submit() {
   error.value = null
   successMessage.value = null
 
+  if (!email.value || !password.value || !passwordConfirm.value) {
+    error.value = 'All fields are required.'
+    return
+  }
+
+  if (password.value !== passwordConfirm.value) {
+    error.value = 'Passwords do not match.'
+    return
+  }
+
+  if (password.value.length < 6) {
+    error.value = 'Password must be at least 6 characters long.'
+    return
+  }
+
   try {
-    await register({email: email.value, password: password.value})
+    await register({email: email.value, password: password.value, password_confirm: passwordConfirm.value})
     successMessage.value = 'Registration successful! Please check your email to activate your account.'
 
     setTimeout(() => {
       router.push('/login')
-    }, 2000)
+    }, 3000)
   } catch (e: any) {
     error.value = e.response?.data?.message || 'Registration failed. Please try again.'
   }
@@ -59,6 +75,15 @@ async function submit() {
         label="Password"
         type="password"
         placeholder="Enter your password"
+        :disabled="isLoading"
+      />
+
+      <BaseInput
+        v-model="passwordConfirm"
+        id="password_confirm"
+        label="Confirm Password"
+        type="password"
+        placeholder="Confirm your password"
         :disabled="isLoading"
       />
 
