@@ -8,7 +8,7 @@ import {
   logoutRequest,
   registerRequest
 } from '@/api/auth'
-import type {AssignRolePayload, AuthCredentials, Role, User} from '@/types/auth'
+import type {AssignRolePayload, LoginCredentials, RegisterCredentials, Role, User} from '@/types/auth'
 import {router} from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(false)
   const isAuthenticated = computed(() => currentUser.value !== null)
 
-  async function register(data: AuthCredentials) {
+  async function register(data: RegisterCredentials) {
     isLoading.value = true
     try {
       await registerRequest(data)
@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function login(data: AuthCredentials) {
+  async function login(data: LoginCredentials) {
     isLoading.value = true
     try {
       await loginRequest(data)

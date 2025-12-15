@@ -1,10 +1,10 @@
 import http from './http';
-import type {AuthCredentials, AuthResponse, User, Role, AssignRolePayload} from '../types/auth';
+import type {LoginCredentials, AuthResponse, User, Role, AssignRolePayload, RegisterCredentials} from '../types/auth';
 
-export const registerRequest = (data: AuthCredentials) =>
+export const registerRequest = (data: RegisterCredentials) =>
   http.post<AuthResponse>('/register', data)
 
-export const loginRequest = (data: AuthCredentials) =>
+export const loginRequest = (data: LoginCredentials) =>
   http.post<AuthResponse>('/login', data)
 
 export const logoutRequest = () =>
